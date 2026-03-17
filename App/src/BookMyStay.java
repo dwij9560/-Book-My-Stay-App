@@ -85,8 +85,7 @@ class BookingRequestQueue{
  * in a fair and predictable order.
  *
  * No room allocation or inventory
- * update is performed here.
- *
+ * update is performed here
  * @version 5.0
  */
 public class BookMyStay{
@@ -94,6 +93,10 @@ public class BookMyStay{
         System.out.println("===== BOOKING REQUEST QUEUE =====\n");
 
         BookingRequestQueue bookingQueue=new BookingRequestQueue();
+
+
+
+
 
         Reservation r1=new Reservation("Abhi", "Single");
         Reservation r2=new Reservation("Subha", "Double");
