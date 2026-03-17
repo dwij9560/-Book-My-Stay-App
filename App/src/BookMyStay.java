@@ -1,135 +1,118 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * ===============================================================
- * ABSTRACT CLASS - Room
+ * CLASS - Reservation
  * ===============================================================
  *
- * Use Case 3: Centralized Room Inventory Management
+ * Use Case 5: Booking Request (FIFO)
  *
- * @version 3.1
+ * Description:
+ * This class represents a booking request
+ * made by a guest.
+ *
+ * At this stage, a reservation only captures
+ * intent, not confirmation or room allocation.
+ *
+ * @version 5.0
  */
-abstract class Room{
-    protected int numberOfBeds;
-    protected int squareFeet;
-    protected double pricePerNight;
+class Reservation{
+    private String guestName;
 
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight){
-        this.numberOfBeds=numberOfBeds;
-        this.squareFeet=squareFeet;
-        this.pricePerNight=pricePerNight;
+    private String roomType;
+
+    public Reservation(String guestName, String roomType){
+        this.guestName=guestName;
+        this.roomType=roomType;
     }
 
-    public void displayRoomDetails(){
-        System.out.println("Beds: "+numberOfBeds);
-        System.out.println("Size: "+squareFeet+" sq.ft");
-        System.out.println("Price per night: ₹"+pricePerNight);
+    public String getGuestName(){
+        return guestName;
+    }
+
+    public String getRoomType(){
+        return roomType;
     }
 }
 
 /**
  * ===============================================================
- * CLASS - SingleRoom
- * ===============================================================
- */
-class SingleRoom extends Room{
-    public SingleRoom(){
-        super(1, 250, 1500.0);
-    }
-}
-
-/**
- * ===============================================================
- * CLASS - DoubleRoom
- * ===============================================================
- */
-class DoubleRoom extends Room{
-    public DoubleRoom(){
-        super(2, 400, 2500.0);
-    }
-}
-
-/**
- * ===============================================================
- * CLASS - SuiteRoom
- * ===============================================================
- */
-class SuiteRoom extends Room{
-    public SuiteRoom(){
-        super(3, 750, 5000.0);
-    }
-}
-
-/**
- * ===============================================================
- * CLASS - RoomInventory
+ * CLASS - BookingRequestQueue
  * ===============================================================
  *
- * Acts as centralized inventory using HashMap
+ * Use Case 5: Booking Request (FIFO)
  *
- * @version 3.1
+ * Description:
+ * This class manages booking requests
+ * using a queue to ensure fair allocation.
+ *
+ * Requests are processed strictly
+ * in the order they are received.
+ *
+ * @version 5.0
  */
-class RoomInventory{
-    private Map<String, Integer> roomAvailability;
+class BookingRequestQueue{
+    private Queue<Reservation> requestQueue;
 
-    public RoomInventory(){
-        roomAvailability=new HashMap<>();
-        initializeInventory();
+    public BookingRequestQueue(){
+        requestQueue=new LinkedList<>();
     }
 
-    private void initializeInventory(){
-        roomAvailability.put("SingleRoom", 5);
-        roomAvailability.put("DoubleRoom", 3);
-        roomAvailability.put("SuiteRoom", 2);
+    public void addRequest(Reservation reservation){
+        requestQueue.offer(reservation);
     }
 
-    public Map<String, Integer> getRoomAvailability(){
-        return roomAvailability;
+    public Reservation getNextRequest(){
+        return requestQueue.poll();
     }
 
-    public void updateAvailability(String roomType, int count){
-        roomAvailability.put(roomType, count);
+    public boolean hasPendingRequests(){
+        return !requestQueue.isEmpty();
     }
 }
 
 /**
  * ===============================================================
- * MAIN CLASS - UseCase3InventorySetup
+ * MAIN CLASS - UseCase5BookingRequestQueue
  * ===============================================================
  *
- * @version 3.1
+ * Use Case 5: Booking Request (FIFO)
+ *
+ * Description:
+ * This class demonstrates how booking
+ * requests are accepted and queued
+ * in a fair and predictable order.
+ *
+ * No room allocation or inventory
+ * update is performed here.
+ *
+ * @version 5.0
  */
 public class BookMyStay{
     public static void main(String[] args){
-        Room singleRoom=new SingleRoom();
-        Room doubleRoom=new DoubleRoom();
-        Room suiteRoom=new SuiteRoom();
+        System.out.println("===== BOOKING REQUEST QUEUE =====\n");
 
-        RoomInventory inventory=new RoomInventory();
+        BookingRequestQueue bookingQueue=new BookingRequestQueue();
 
-        System.out.println("===== CENTRALIZED ROOM INVENTORY =====\n");
+        Reservation r1=new Reservation("Abhi", "Single");
+        Reservation r2=new Reservation("Subha", "Double");
+        Reservation r3=new Reservation("Vanmathi", "Suite");
 
-        System.out.println("Single Room:");
-        singleRoom.displayRoomDetails();
-        System.out.println("Available: "+inventory.getRoomAvailability().get("SingleRoom"));
-        System.out.println();
+        bookingQueue.addRequest(r1);
+        bookingQueue.addRequest(r2);
+        bookingQueue.addRequest(r3);
 
-        System.out.println("Double Room:");
-        doubleRoom.displayRoomDetails();
-        System.out.println("Available: "+inventory.getRoomAvailability().get("DoubleRoom"));
-        System.out.println();
+        System.out.println("Processing booking requests (FIFO):\n");
 
-        System.out.println("Suite Room:");
-        suiteRoom.displayRoomDetails();
-        System.out.println("Available: "+inventory.getRoomAvailability().get("SuiteRoom"));
-        System.out.println();
+        while(bookingQueue.hasPendingRequests()){
+            Reservation r=bookingQueue.getNextRequest();
 
-        System.out.println("Updating SingleRoom availability...\n");
-        inventory.updateAvailability("SingleRoom", 4);
-
-        System.out.println("Updated Availability: "+inventory.getRoomAvailability().get("SingleRoom"));
-
-        System.out.println("\nApplication terminated.");
+            System.out.println("Guest: "+r.getGuestName());
+            System.out.println("Requested Room: "+r.getRoomType());
+            System.out.println("-----------------------------");
+        }
+        System.out.println("All requests processed.");
+        System.out.println("Application terminated.");
     }
 }
