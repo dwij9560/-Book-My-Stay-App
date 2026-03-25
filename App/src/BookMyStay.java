@@ -97,7 +97,7 @@ class FilePersistenceService {
  *
  * @version 12.0
  */
-public class BookMyStayApp {
+public class BookMyStay {
     public static void main(String[] args) {
         System.out.println("System Recovery\n");
 
